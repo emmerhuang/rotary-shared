@@ -1,0 +1,12 @@
+{
+  "name": "rotary-shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rotary 系列共用套件 monorepo（R4 鐵則：single source of truth）。包含 @rotary/global-chat-widget（SSO message hub chat UI）等跨應用共用組件。",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test:widget": "cd packages/global-chat-widget && echo 'tests run via host app (rotarysso/rotaryCredit) since widget has no own tsx runner installed'"
+  }
+}
