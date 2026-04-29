@@ -33,12 +33,23 @@ export default defineConfig({
   clean: true,
   splitting: false,
   treeshake: true,
+  // External 策略修正（2026-04-30 02:06）：
+  //   先前 lucide-react / date-fns external 上 Vercel build 仍 fail，因為 webpack
+  //   從 dist 物理位置 (rotary-shared/packages/.../dist/) 往上 resolve，那層沒
+  //   node_modules，且 file: 模式下 host node_modules 不在這個物理樹的 parent chain。
+  //   修正：把 lucide-react / date-fns(/locale) 也 inline bundle 進 dist，dist 變成
+  //   真正 self-contained。代價是 dist 變肥（lucide-react 單一 icon 用到的會 tree-shake，
+  //   不會把上千 icon 都帶進去；date-fns 也只 bundle 用到的 function 與 zhTW locale）。
+  //   react / react-dom / next 必須 external（雙副本會炸 hooks / Server Component runtime）。
   external: [
     'react',
     'react-dom',
     'react/jsx-runtime',
     'next',
     /^next\//,
+  ],
+  // 額外指定 noExternal 以防 esbuild 把 transitive deps 漏 bundle
+  noExternal: [
     'lucide-react',
     'date-fns',
     /^date-fns\//,
