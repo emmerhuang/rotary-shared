@@ -1,7 +1,11 @@
 node_modules/
 .next/
-dist/
 build/
+# dist/ 例外：widget 預先 build 的 artefact 必須提交 (C 方案)
+# 排除所有 dist 但白名單 packages/*/dist
+dist/
+!packages/*/dist
+!packages/*/dist/**
 *.log
 .DS_Store
 .env
