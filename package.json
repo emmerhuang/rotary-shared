@@ -8,5 +8,16 @@
   ],
   "scripts": {
     "test:widget": "cd packages/global-chat-widget && echo 'tests run via host app (rotarysso/rotaryCredit) since widget has no own tsx runner installed'"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.575.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "typescript": "5.9.3"
   }
 }
