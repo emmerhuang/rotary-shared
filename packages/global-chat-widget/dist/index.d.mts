@@ -1,4 +1,4 @@
-import * as react from 'react';
+import * as react_jsx_runtime from 'react/jsx-runtime';
 
 interface GlobalChatWidgetProps {
     /** Hub base URL（R3 rollback 開關，host 從 NEXT_PUBLIC_MESSAGE_HUB_URL 注入） */
@@ -32,7 +32,7 @@ interface GlobalChatWidgetProps {
         primary?: string;
     };
 }
-declare function GlobalChatWidget({ apiBaseUrl, getAccessToken, sourceApp, myUserId, pathname, onOpenFullPage, onOpenInbox, onUnreadChange, onUploadAttachment, }: GlobalChatWidgetProps): react.JSX.Element | null;
+declare function GlobalChatWidget({ apiBaseUrl, getAccessToken, sourceApp, myUserId, pathname, onOpenFullPage, onOpenInbox, onUnreadChange, onUploadAttachment, }: GlobalChatWidgetProps): react_jsx_runtime.JSX.Element | null;
 
 /**
  * messageClient — internal SDK wrapping all 9 hub endpoints.

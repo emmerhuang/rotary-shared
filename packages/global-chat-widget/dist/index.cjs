@@ -3,6 +3,7 @@
 
 var react = require('react');
 var reactDom = require('react-dom');
+var jsxRuntime = require('react/jsx-runtime');
 
 // src/GlobalChatWidget.tsx
 
@@ -1595,8 +1596,6 @@ var MessageClient = class {
     });
   }
 };
-
-// src/GlobalChatWidget.tsx
 var ONLINE_MS = 45 * 1e3;
 function isOnline(lastSeenAt) {
   if (!lastSeenAt) return false;
@@ -1848,106 +1847,200 @@ function GlobalChatWidget({
   if (!mounted || hidden || !myUserId) return null;
   const activeConv = convs.find((c) => c.id === activeConvId);
   const lightbox = lightboxUrl ? reactDom.createPortal(
-    /* @__PURE__ */ React.createElement("div", { className: "fixed inset-0 z-[200] bg-black/80 flex items-center justify-center", onClick: () => setLightboxUrl(null) }, /* @__PURE__ */ React.createElement("button", { className: "absolute top-4 right-4 text-white hover:text-gray-300" }, /* @__PURE__ */ React.createElement(X, { size: 28 })), /* @__PURE__ */ React.createElement("img", { src: lightboxUrl, alt: "\u5168\u5716", className: "max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl", onClick: (e) => e.stopPropagation() })),
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "fixed inset-0 z-[200] bg-black/80 flex items-center justify-center", onClick: () => setLightboxUrl(null), children: [
+      /* @__PURE__ */ jsxRuntime.jsx("button", { className: "absolute top-4 right-4 text-white hover:text-gray-300", children: /* @__PURE__ */ jsxRuntime.jsx(X, { size: 28 }) }),
+      /* @__PURE__ */ jsxRuntime.jsx("img", { src: lightboxUrl, alt: "\u5168\u5716", className: "max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl", onClick: (e) => e.stopPropagation() })
+    ] }),
     document.body
   ) : null;
-  const widget = /* @__PURE__ */ React.createElement("div", { className: "fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2" }, open && /* @__PURE__ */ React.createElement("div", { className: "w-80 bg-white rounded-xl shadow-2xl border flex flex-col overflow-hidden", style: { height: "420px" } }, /* @__PURE__ */ React.createElement("div", { className: "px-3 py-2.5 bg-blue-700 text-white flex items-center justify-between shrink-0" }, activeConvId ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 min-w-0" }, /* @__PURE__ */ React.createElement("button", { onClick: backToList, className: "hover:text-blue-200 shrink-0" }, /* @__PURE__ */ React.createElement(ArrowLeft, { size: 14 })), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      onClick: () => {
-        setOpen(false);
-        if (activeConvId && onOpenFullPage) onOpenFullPage(activeConvId);
-      },
-      className: "flex items-center gap-1 hover:underline text-left min-w-0"
-    },
-    /* @__PURE__ */ React.createElement("span", { className: "text-sm font-medium truncate" }, activeConv?.other.rotaryClubName ?? "")
-  )), /* @__PURE__ */ React.createElement("button", { onClick: () => {
-    setOpen(false);
-    dismissedRef.current = true;
-  }, className: "hover:text-blue-200 shrink-0 ml-1" }, /* @__PURE__ */ React.createElement(X, { size: 15 }))) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", { className: "text-sm font-medium" }, "\u79C1\u4EBA\u8A0A\u606F"), /* @__PURE__ */ React.createElement("button", { onClick: () => {
-    setOpen(false);
-    dismissedRef.current = true;
-  }, className: "hover:text-blue-200" }, /* @__PURE__ */ React.createElement(X, { size: 15 })))), !activeConvId && /* @__PURE__ */ React.createElement("div", { className: "flex-1 overflow-y-auto divide-y divide-gray-100" }, convs.length === 0 && /* @__PURE__ */ React.createElement("p", { className: "text-center text-sm text-gray-400 py-10" }, "\u5C1A\u7121\u5C0D\u8A71"), convs.map((conv) => /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      key: conv.id,
-      onClick: () => openConv(conv.id),
-      className: "w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 text-left transition-colors"
-    },
-    /* @__PURE__ */ React.createElement("div", { className: "relative shrink-0" }, /* @__PURE__ */ React.createElement("div", { className: "w-9 h-9 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-semibold text-sm" }, conv.other.rotaryClubName.slice(0, 1)), isOnline(conv.other.lastSeenAt) && /* @__PURE__ */ React.createElement("span", { className: "absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" })),
-    /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React.createElement("span", { className: "text-sm font-medium text-gray-900 truncate" }, conv.other.rotaryClubName), conv.latestMessage?.createdAt && /* @__PURE__ */ React.createElement("span", { className: "text-[10px] text-gray-400 shrink-0 ml-1" }, formatDistanceToNow(/* @__PURE__ */ new Date(conv.latestMessage.createdAt.replace(" ", "T") + "Z"), { locale: zhTW, addSuffix: true }))), /* @__PURE__ */ React.createElement("div", { className: "flex items-center justify-between mt-0.5" }, /* @__PURE__ */ React.createElement("span", { className: "text-xs text-gray-500 truncate" }, conv.latestMessage?.content ?? "\u5C1A\u7121\u8A0A\u606F"), conv.unreadCount > 0 && /* @__PURE__ */ React.createElement("span", { className: "ml-1 shrink-0 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1" }, conv.unreadCount > 99 ? "99+" : conv.unreadCount)))
-  ))), activeConvId && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { ref: scrollContainerRef, onScroll: handleScroll, className: "flex-1 overflow-y-auto px-3 py-2 space-y-2 bg-gray-50" }, msgs.length === 0 && /* @__PURE__ */ React.createElement("p", { className: "text-center text-xs text-gray-400 py-6" }, "\u958B\u59CB\u50B3\u9001\u7B2C\u4E00\u5247\u8A0A\u606F\u5427\uFF01"), msgs.map((msg) => {
-    const isMine = activeConv ? msg.senderId !== activeConv.other.id : false;
-    return /* @__PURE__ */ React.createElement("div", { key: msg.id, className: `group flex flex-col ${isMine ? "items-end" : "items-start"}` }, /* @__PURE__ */ React.createElement("div", { className: `flex items-end gap-1 ${isMine ? "flex-row-reverse" : "flex-row"}` }, /* @__PURE__ */ React.createElement(
+  const widget = /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2", children: [
+    open && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "w-80 bg-white rounded-xl shadow-2xl border flex flex-col overflow-hidden", style: { height: "420px" }, children: [
+      /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-3 py-2.5 bg-blue-700 text-white flex items-center justify-between shrink-0", children: activeConvId ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-1.5 min-w-0", children: [
+          /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: backToList, className: "hover:text-blue-200 shrink-0", children: /* @__PURE__ */ jsxRuntime.jsx(ArrowLeft, { size: 14 }) }),
+          /* @__PURE__ */ jsxRuntime.jsx(
+            "button",
+            {
+              onClick: () => {
+                setOpen(false);
+                if (activeConvId && onOpenFullPage) onOpenFullPage(activeConvId);
+              },
+              className: "flex items-center gap-1 hover:underline text-left min-w-0",
+              children: /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium truncate", children: activeConv?.other.rotaryClubName ?? "" })
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => {
+          setOpen(false);
+          dismissedRef.current = true;
+        }, className: "hover:text-blue-200 shrink-0 ml-1", children: /* @__PURE__ */ jsxRuntime.jsx(X, { size: 15 }) })
+      ] }) : /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium", children: "\u79C1\u4EBA\u8A0A\u606F" }),
+        /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => {
+          setOpen(false);
+          dismissedRef.current = true;
+        }, className: "hover:text-blue-200", children: /* @__PURE__ */ jsxRuntime.jsx(X, { size: 15 }) })
+      ] }) }),
+      !activeConvId && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-1 overflow-y-auto divide-y divide-gray-100", children: [
+        convs.length === 0 && /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-center text-sm text-gray-400 py-10", children: "\u5C1A\u7121\u5C0D\u8A71" }),
+        convs.map((conv) => /* @__PURE__ */ jsxRuntime.jsxs(
+          "button",
+          {
+            onClick: () => openConv(conv.id),
+            className: "w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 text-left transition-colors",
+            children: [
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative shrink-0", children: [
+                /* @__PURE__ */ jsxRuntime.jsx("div", { className: "w-9 h-9 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-semibold text-sm", children: conv.other.rotaryClubName.slice(0, 1) }),
+                isOnline(conv.other.lastSeenAt) && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" })
+              ] }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-1 min-w-0", children: [
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-sm font-medium text-gray-900 truncate", children: conv.other.rotaryClubName }),
+                  conv.latestMessage?.createdAt && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] text-gray-400 shrink-0 ml-1", children: formatDistanceToNow(/* @__PURE__ */ new Date(conv.latestMessage.createdAt.replace(" ", "T") + "Z"), { locale: zhTW, addSuffix: true }) })
+                ] }),
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-between mt-0.5", children: [
+                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-xs text-gray-500 truncate", children: conv.latestMessage?.content ?? "\u5C1A\u7121\u8A0A\u606F" }),
+                  conv.unreadCount > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "ml-1 shrink-0 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1", children: conv.unreadCount > 99 ? "99+" : conv.unreadCount })
+                ] })
+              ] })
+            ]
+          },
+          conv.id
+        ))
+      ] }),
+      activeConvId && /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { ref: scrollContainerRef, onScroll: handleScroll, className: "flex-1 overflow-y-auto px-3 py-2 space-y-2 bg-gray-50", children: [
+          msgs.length === 0 && /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-center text-xs text-gray-400 py-6", children: "\u958B\u59CB\u50B3\u9001\u7B2C\u4E00\u5247\u8A0A\u606F\u5427\uFF01" }),
+          msgs.map((msg) => {
+            const isMine = activeConv ? msg.senderId !== activeConv.other.id : false;
+            return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: `group flex flex-col ${isMine ? "items-end" : "items-start"}`, children: [
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: `flex items-end gap-1 ${isMine ? "flex-row-reverse" : "flex-row"}`, children: [
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  "button",
+                  {
+                    onClick: () => {
+                      setReplyTo(msg);
+                      inputRef.current?.focus();
+                    },
+                    className: "opacity-0 group-hover:opacity-100 transition-opacity p-0.5 text-gray-400 hover:text-blue-500 shrink-0 mb-1",
+                    title: "\u56DE\u8986",
+                    children: /* @__PURE__ */ jsxRuntime.jsx(Reply, { size: 12 })
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: `max-w-[80%] px-2.5 py-1.5 rounded-xl text-sm ${isMine ? "bg-blue-600 text-white" : "bg-white shadow-sm text-gray-900"}`, children: [
+                  msg.replyToContent != null && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: `mb-1 px-1.5 py-1 rounded text-xs border-l-2 ${isMine ? "border-blue-300 bg-blue-500 text-blue-100" : "border-gray-300 bg-gray-100 text-gray-500"}`, children: [
+                    /* @__PURE__ */ jsxRuntime.jsx("p", { className: "font-medium", children: msg.replyToSenderName }),
+                    /* @__PURE__ */ jsxRuntime.jsx("p", { className: "truncate", children: msg.replyToContent || "\u9644\u4EF6" })
+                  ] }),
+                  msg.content && (() => {
+                    const sm = getStickerMatch(msg.content);
+                    return sm ? /* @__PURE__ */ jsxRuntime.jsx("img", { src: stickerUrl(sm.id), alt: sm.emoji, className: "w-14 h-14" }) : /* @__PURE__ */ jsxRuntime.jsx("p", { className: "whitespace-pre-wrap break-words", children: msg.content });
+                  })(),
+                  msg.attachmentUrl ? msg.attachmentType?.startsWith("image/") ? /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => setLightboxUrl(msg.attachmentUrl), className: "mt-1 block", children: /* @__PURE__ */ jsxRuntime.jsx("img", { src: msg.attachmentUrl, alt: msg.attachmentName ?? "\u5716\u7247", className: "max-w-[160px] max-h-[160px] rounded-lg object-cover cursor-zoom-in hover:opacity-90 transition-opacity" }) }) : /* @__PURE__ */ jsxRuntime.jsxs(
+                    "a",
+                    {
+                      href: msg.attachmentUrl,
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      className: `flex items-center gap-1.5 mt-1 text-xs ${isMine ? "text-blue-100 hover:text-white" : "text-gray-600 hover:text-gray-900"}`,
+                      children: [
+                        /* @__PURE__ */ jsxRuntime.jsx(FileText, { size: 12 }),
+                        /* @__PURE__ */ jsxRuntime.jsx("span", { className: "truncate max-w-[120px]", children: msg.attachmentName ?? "\u9644\u4EF6" })
+                      ]
+                    }
+                  ) : !msg.content && msg.replyToContent == null && /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-xs opacity-60", children: "\u9644\u4EF6\u5DF2\u904E\u671F" })
+                ] })
+              ] }),
+              isMine && msg.readAt && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] text-gray-400 mt-0.5 px-1", children: "\u5DF2\u8B80" })
+            ] }, msg.id);
+          }),
+          /* @__PURE__ */ jsxRuntime.jsx("div", { ref: bottomRef })
+        ] }),
+        replyTo && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-2 py-1.5 bg-blue-50 border-t flex items-center gap-2 text-xs shrink-0", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(Reply, { size: 11, className: "text-blue-500 shrink-0" }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-1 min-w-0", children: [
+            /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-blue-600 font-medium", children: replyTo.replyToSenderName ?? (activeConv && replyTo.senderId === activeConv.other.id ? activeConv.other.contactName : "\u4F60") }),
+            /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-gray-500 truncate", children: replyTo.content || replyTo.attachmentName || "\u9644\u4EF6" })
+          ] }),
+          /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => setReplyTo(null), className: "hover:text-red-500 shrink-0", children: /* @__PURE__ */ jsxRuntime.jsx(X, { size: 11 }) })
+        ] }),
+        pendingFile && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-2 py-1.5 bg-blue-50 border-t shrink-0", children: previewUrl ? /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-start gap-2", children: [
+          /* @__PURE__ */ jsxRuntime.jsx("img", { src: previewUrl, alt: "\u9810\u89BD", className: "max-h-[80px] max-w-[120px] rounded-lg object-cover border border-blue-200" }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-1 min-w-0 mt-0.5", children: [
+            /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-xs text-blue-700 truncate", children: pendingFile.name }),
+            /* @__PURE__ */ jsxRuntime.jsx("p", { className: "text-[10px] text-blue-400 mt-0.5", children: "\u6309\u9001\u51FA\u9375\u4E0A\u50B3" })
+          ] }),
+          /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => setPendingFile(null), className: "shrink-0 text-gray-400 hover:text-red-500", children: /* @__PURE__ */ jsxRuntime.jsx(X, { size: 12 }) })
+        ] }) : /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2 text-xs text-blue-700", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(FileText, { size: 12 }),
+          /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1 truncate", children: pendingFile.name }),
+          /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => setPendingFile(null), className: "hover:text-red-500", children: /* @__PURE__ */ jsxRuntime.jsx(X, { size: 12 }) })
+        ] }) }),
+        uploadError && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-2 py-1.5 bg-red-50 border-t flex items-center gap-1.5 text-xs text-red-600 shrink-0", children: [
+          /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1", children: uploadError }),
+          /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => setUploadError(null), className: "hover:text-red-800", children: /* @__PURE__ */ jsxRuntime.jsx(X, { size: 11 }) })
+        ] }),
+        stickerOpen && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-2 py-2 border-t bg-white grid grid-cols-8 gap-1 shrink-0", children: STICKERS.map((s) => /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => sendSticker(s.emoji), className: "hover:bg-gray-100 rounded-lg p-0.5 transition-colors flex items-center justify-center", children: /* @__PURE__ */ jsxRuntime.jsx("img", { src: stickerUrl(s.id), alt: s.emoji, className: "w-7 h-7" }) }, s.id)) }),
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "px-2 py-2 border-t flex gap-1.5 shrink-0 bg-white", children: [
+          /* @__PURE__ */ jsxRuntime.jsx("input", { ref: fileInputRef, type: "file", className: "hidden", onChange: (e) => {
+            const file = e.target.files?.[0] ?? null;
+            if (file && file.size > 3 * 1024 * 1024) {
+              setUploadError("\u6A94\u6848\u5927\u5C0F\u4E0D\u53EF\u8D85\u904E 3 MB");
+              e.target.value = "";
+              return;
+            }
+            setPendingFile(file);
+          } }),
+          /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => fileInputRef.current?.click(), className: "shrink-0 p-1.5 text-gray-400 hover:text-blue-600 rounded-lg transition-colors", title: "\u9644\u52A0\u6A94\u6848", children: /* @__PURE__ */ jsxRuntime.jsx(Paperclip, { size: 15 }) }),
+          /* @__PURE__ */ jsxRuntime.jsx("button", { onClick: () => setStickerOpen((o) => !o), className: `shrink-0 p-1.5 rounded-lg transition-colors ${stickerOpen ? "text-blue-600 bg-blue-50" : "text-gray-400 hover:text-blue-600"}`, title: "\u8CBC\u5716", children: /* @__PURE__ */ jsxRuntime.jsx(Smile, { size: 15 }) }),
+          /* @__PURE__ */ jsxRuntime.jsx(
+            "input",
+            {
+              ref: inputRef,
+              className: "flex-1 text-sm border rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500",
+              placeholder: "\u8F38\u5165\u8A0A\u606F\u2026",
+              value: draft,
+              onChange: (e) => setDraft(e.target.value),
+              onKeyDown: (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  send();
+                }
+              },
+              autoFocus: true
+            }
+          ),
+          /* @__PURE__ */ jsxRuntime.jsx(
+            "button",
+            {
+              onClick: send,
+              disabled: !draft.trim() && !pendingFile || uploading,
+              className: "p-2 bg-blue-600 text-white rounded-lg disabled:opacity-40 hover:bg-blue-700 transition-colors",
+              children: /* @__PURE__ */ jsxRuntime.jsx(Send, { size: 14 })
+            }
+          )
+        ] })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntime.jsxs(
       "button",
       {
         onClick: () => {
-          setReplyTo(msg);
-          inputRef.current?.focus();
+          if (open) dismissedRef.current = true;
+          setOpen((o) => !o);
         },
-        className: "opacity-0 group-hover:opacity-100 transition-opacity p-0.5 text-gray-400 hover:text-blue-500 shrink-0 mb-1",
-        title: "\u56DE\u8986"
-      },
-      /* @__PURE__ */ React.createElement(Reply, { size: 12 })
-    ), /* @__PURE__ */ React.createElement("div", { className: `max-w-[80%] px-2.5 py-1.5 rounded-xl text-sm ${isMine ? "bg-blue-600 text-white" : "bg-white shadow-sm text-gray-900"}` }, msg.replyToContent != null && /* @__PURE__ */ React.createElement("div", { className: `mb-1 px-1.5 py-1 rounded text-xs border-l-2 ${isMine ? "border-blue-300 bg-blue-500 text-blue-100" : "border-gray-300 bg-gray-100 text-gray-500"}` }, /* @__PURE__ */ React.createElement("p", { className: "font-medium" }, msg.replyToSenderName), /* @__PURE__ */ React.createElement("p", { className: "truncate" }, msg.replyToContent || "\u9644\u4EF6")), msg.content && (() => {
-      const sm = getStickerMatch(msg.content);
-      return sm ? /* @__PURE__ */ React.createElement("img", { src: stickerUrl(sm.id), alt: sm.emoji, className: "w-14 h-14" }) : /* @__PURE__ */ React.createElement("p", { className: "whitespace-pre-wrap break-words" }, msg.content);
-    })(), msg.attachmentUrl ? msg.attachmentType?.startsWith("image/") ? /* @__PURE__ */ React.createElement("button", { onClick: () => setLightboxUrl(msg.attachmentUrl), className: "mt-1 block" }, /* @__PURE__ */ React.createElement("img", { src: msg.attachmentUrl, alt: msg.attachmentName ?? "\u5716\u7247", className: "max-w-[160px] max-h-[160px] rounded-lg object-cover cursor-zoom-in hover:opacity-90 transition-opacity" })) : /* @__PURE__ */ React.createElement(
-      "a",
-      {
-        href: msg.attachmentUrl,
-        target: "_blank",
-        rel: "noopener noreferrer",
-        className: `flex items-center gap-1.5 mt-1 text-xs ${isMine ? "text-blue-100 hover:text-white" : "text-gray-600 hover:text-gray-900"}`
-      },
-      /* @__PURE__ */ React.createElement(FileText, { size: 12 }),
-      /* @__PURE__ */ React.createElement("span", { className: "truncate max-w-[120px]" }, msg.attachmentName ?? "\u9644\u4EF6")
-    ) : !msg.content && msg.replyToContent == null && /* @__PURE__ */ React.createElement("p", { className: "text-xs opacity-60" }, "\u9644\u4EF6\u5DF2\u904E\u671F"))), isMine && msg.readAt && /* @__PURE__ */ React.createElement("span", { className: "text-[10px] text-gray-400 mt-0.5 px-1" }, "\u5DF2\u8B80"));
-  }), /* @__PURE__ */ React.createElement("div", { ref: bottomRef })), replyTo && /* @__PURE__ */ React.createElement("div", { className: "px-2 py-1.5 bg-blue-50 border-t flex items-center gap-2 text-xs shrink-0" }, /* @__PURE__ */ React.createElement(Reply, { size: 11, className: "text-blue-500 shrink-0" }), /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React.createElement("p", { className: "text-blue-600 font-medium" }, replyTo.replyToSenderName ?? (activeConv && replyTo.senderId === activeConv.other.id ? activeConv.other.contactName : "\u4F60")), /* @__PURE__ */ React.createElement("p", { className: "text-gray-500 truncate" }, replyTo.content || replyTo.attachmentName || "\u9644\u4EF6")), /* @__PURE__ */ React.createElement("button", { onClick: () => setReplyTo(null), className: "hover:text-red-500 shrink-0" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))), pendingFile && /* @__PURE__ */ React.createElement("div", { className: "px-2 py-1.5 bg-blue-50 border-t shrink-0" }, previewUrl ? /* @__PURE__ */ React.createElement("div", { className: "flex items-start gap-2" }, /* @__PURE__ */ React.createElement("img", { src: previewUrl, alt: "\u9810\u89BD", className: "max-h-[80px] max-w-[120px] rounded-lg object-cover border border-blue-200" }), /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0 mt-0.5" }, /* @__PURE__ */ React.createElement("p", { className: "text-xs text-blue-700 truncate" }, pendingFile.name), /* @__PURE__ */ React.createElement("p", { className: "text-[10px] text-blue-400 mt-0.5" }, "\u6309\u9001\u51FA\u9375\u4E0A\u50B3")), /* @__PURE__ */ React.createElement("button", { onClick: () => setPendingFile(null), className: "shrink-0 text-gray-400 hover:text-red-500" }, /* @__PURE__ */ React.createElement(X, { size: 12 }))) : /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2 text-xs text-blue-700" }, /* @__PURE__ */ React.createElement(FileText, { size: 12 }), /* @__PURE__ */ React.createElement("span", { className: "flex-1 truncate" }, pendingFile.name), /* @__PURE__ */ React.createElement("button", { onClick: () => setPendingFile(null), className: "hover:text-red-500" }, /* @__PURE__ */ React.createElement(X, { size: 12 })))), uploadError && /* @__PURE__ */ React.createElement("div", { className: "px-2 py-1.5 bg-red-50 border-t flex items-center gap-1.5 text-xs text-red-600 shrink-0" }, /* @__PURE__ */ React.createElement("span", { className: "flex-1" }, uploadError), /* @__PURE__ */ React.createElement("button", { onClick: () => setUploadError(null), className: "hover:text-red-800" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))), stickerOpen && /* @__PURE__ */ React.createElement("div", { className: "px-2 py-2 border-t bg-white grid grid-cols-8 gap-1 shrink-0" }, STICKERS.map((s) => /* @__PURE__ */ React.createElement("button", { key: s.id, onClick: () => sendSticker(s.emoji), className: "hover:bg-gray-100 rounded-lg p-0.5 transition-colors flex items-center justify-center" }, /* @__PURE__ */ React.createElement("img", { src: stickerUrl(s.id), alt: s.emoji, className: "w-7 h-7" })))), /* @__PURE__ */ React.createElement("div", { className: "px-2 py-2 border-t flex gap-1.5 shrink-0 bg-white" }, /* @__PURE__ */ React.createElement("input", { ref: fileInputRef, type: "file", className: "hidden", onChange: (e) => {
-    const file = e.target.files?.[0] ?? null;
-    if (file && file.size > 3 * 1024 * 1024) {
-      setUploadError("\u6A94\u6848\u5927\u5C0F\u4E0D\u53EF\u8D85\u904E 3 MB");
-      e.target.value = "";
-      return;
-    }
-    setPendingFile(file);
-  } }), /* @__PURE__ */ React.createElement("button", { onClick: () => fileInputRef.current?.click(), className: "shrink-0 p-1.5 text-gray-400 hover:text-blue-600 rounded-lg transition-colors", title: "\u9644\u52A0\u6A94\u6848" }, /* @__PURE__ */ React.createElement(Paperclip, { size: 15 })), /* @__PURE__ */ React.createElement("button", { onClick: () => setStickerOpen((o) => !o), className: `shrink-0 p-1.5 rounded-lg transition-colors ${stickerOpen ? "text-blue-600 bg-blue-50" : "text-gray-400 hover:text-blue-600"}`, title: "\u8CBC\u5716" }, /* @__PURE__ */ React.createElement(Smile, { size: 15 })), /* @__PURE__ */ React.createElement(
-    "input",
-    {
-      ref: inputRef,
-      className: "flex-1 text-sm border rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500",
-      placeholder: "\u8F38\u5165\u8A0A\u606F\u2026",
-      value: draft,
-      onChange: (e) => setDraft(e.target.value),
-      onKeyDown: (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          send();
-        }
-      },
-      autoFocus: true
-    }
-  ), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      onClick: send,
-      disabled: !draft.trim() && !pendingFile || uploading,
-      className: "p-2 bg-blue-600 text-white rounded-lg disabled:opacity-40 hover:bg-blue-700 transition-colors"
-    },
-    /* @__PURE__ */ React.createElement(Send, { size: 14 })
-  )))), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      onClick: () => {
-        if (open) dismissedRef.current = true;
-        setOpen((o) => !o);
-      },
-      className: "w-12 h-12 bg-blue-700 hover:bg-blue-800 text-white rounded-full shadow-lg flex items-center justify-center transition-colors relative"
-    },
-    /* @__PURE__ */ React.createElement(MessageCircle, { size: 22 }),
-    unread > 0 && /* @__PURE__ */ React.createElement("span", { className: "absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none" }, unread > 99 ? "99+" : unread)
-  ));
-  return /* @__PURE__ */ React.createElement(React.Fragment, null, lightbox, reactDom.createPortal(widget, document.body));
+        className: "w-12 h-12 bg-blue-700 hover:bg-blue-800 text-white rounded-full shadow-lg flex items-center justify-center transition-colors relative",
+        children: [
+          /* @__PURE__ */ jsxRuntime.jsx(MessageCircle, { size: 22 }),
+          unread > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none", children: unread > 99 ? "99+" : unread })
+        ]
+      }
+    )
+  ] });
+  return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+    lightbox,
+    reactDom.createPortal(widget, document.body)
+  ] });
 }
 /*! Bundled license information:
 
