@@ -1,5 +1,27 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 
+/**
+ * widgetSignals — D1 私訊「外部指令開啟」的純邏輯閘門。
+ *
+ * 抽出原因（DOM-free 可測，對齊本 package 既有結構性/邏輯性測試哲學）：
+ *   host（rotarysso Navbar 訊息圖示 / NewMessageDialog 建對話成功）需要能從 widget
+ *   外部把它「打開」。widget 的 `open` 原本是純內部 useState、外部開不了。openSignal
+ *   prop 帶一個單調遞增的 nonce（外加可選 conversationId）當作「請打開」的指令。
+ *
+ * 為何用 nonce 而非 boolean：
+ *   同一個對話可能被連續點兩次（關掉後再點），boolean 無法表達「又一次請求」；
+ *   nonce 每次點擊 +1，widget 以「nonce 是否變新」判定是否要再開一次。
+ *
+ * AT-MSG-7 迴歸保證：openSignal 不傳（rotaryCredit 現行用法）→ isNewOpenSignal 恆
+ * 回 false，掛在 widget 上的 open-effect 變成 no-op，既有開合行為 bit-for-bit 不變。
+ */
+interface OpenSignal {
+    /** 可選：要直接開到哪個對話；null/未給＝只開清單視圖 */
+    conversationId?: number | null;
+    /** 單調遞增指令序號；每次「請打開」都給新值 */
+    nonce: number;
+}
+
 interface GlobalChatWidgetProps {
     /** Hub base URL（R3 rollback 開關，host 從 NEXT_PUBLIC_MESSAGE_HUB_URL 注入） */
     apiBaseUrl: string;
@@ -27,12 +49,24 @@ interface GlobalChatWidgetProps {
         name: string;
         type: string;
     }>;
+    /**
+     * 外部指令開啟 widget（D1 私訊，additive optional）。host 帶單調遞增 nonce 表示
+     * 「請打開」，可選 conversationId 直接開到某對話。**不傳＝行為 bit-for-bit 不變**
+     * （AT-MSG-7；rotaryCredit 不傳＝零影響）。widget 的 open 原本純內部 state、外部
+     * 開不了 —— 這 prop 補上「Navbar 訊息圖示點擊 / 建對話成功後跳入」兩個 host 需求。
+     */
+    openSignal?: OpenSignal | null;
+    /**
+     * 顯示「新對話」入口（D1 私訊，additive optional）。有傳才在清單 header 渲染「新對話」
+     * 鈕，點擊交還 host 開發起對話 dialog。**不傳＝鈕不出現、與現狀相同**（AT-MSG-7）。
+     */
+    onComposeNew?: () => void;
     /** 預留主題客製化（v1 未實作；佔欄位避 break change） */
     theme?: {
         primary?: string;
     };
 }
-declare function GlobalChatWidget({ apiBaseUrl, getAccessToken, sourceApp, myUserId, pathname, onOpenFullPage, onOpenInbox, onUnreadChange, onUploadAttachment, }: GlobalChatWidgetProps): react_jsx_runtime.JSX.Element | null;
+declare function GlobalChatWidget({ apiBaseUrl, getAccessToken, sourceApp, myUserId, pathname, onOpenFullPage, onOpenInbox, onUnreadChange, onUploadAttachment, openSignal, onComposeNew, }: GlobalChatWidgetProps): react_jsx_runtime.JSX.Element | null;
 
 /**
  * messageClient — internal SDK wrapping all 9 hub endpoints.
@@ -138,4 +172,4 @@ interface SendMessageInput {
     clientMessageId?: string;
 }
 
-export { type BlockRow, type ConversationDetail, type ConversationRow, type ConversationSummary, GlobalChatWidget, type GlobalChatWidgetProps, type HubMessage, type SendMessageInput, type UserSummary };
+export { type BlockRow, type ConversationDetail, type ConversationRow, type ConversationSummary, GlobalChatWidget, type GlobalChatWidgetProps, type HubMessage, type OpenSignal, type SendMessageInput, type UserSummary };

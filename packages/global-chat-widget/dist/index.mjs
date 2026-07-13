@@ -132,8 +132,22 @@ var __iconNode3 = [
 ];
 var MessageCircle = createLucideIcon("message-circle", __iconNode3);
 
-// ../../node_modules/lucide-react/dist/esm/icons/paperclip.js
+// ../../node_modules/lucide-react/dist/esm/icons/message-square-plus.js
 var __iconNode4 = [
+  [
+    "path",
+    {
+      d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
+      key: "18887p"
+    }
+  ],
+  ["path", { d: "M12 8v6", key: "1ib9pf" }],
+  ["path", { d: "M9 11h6", key: "1fldmi" }]
+];
+var MessageSquarePlus = createLucideIcon("message-square-plus", __iconNode4);
+
+// ../../node_modules/lucide-react/dist/esm/icons/paperclip.js
+var __iconNode5 = [
   [
     "path",
     {
@@ -142,17 +156,17 @@ var __iconNode4 = [
     }
   ]
 ];
-var Paperclip = createLucideIcon("paperclip", __iconNode4);
+var Paperclip = createLucideIcon("paperclip", __iconNode5);
 
 // ../../node_modules/lucide-react/dist/esm/icons/reply.js
-var __iconNode5 = [
+var __iconNode6 = [
   ["path", { d: "M20 18v-2a4 4 0 0 0-4-4H4", key: "5vmcpk" }],
   ["path", { d: "m9 17-5-5 5-5", key: "nvlc11" }]
 ];
-var Reply = createLucideIcon("reply", __iconNode5);
+var Reply = createLucideIcon("reply", __iconNode6);
 
 // ../../node_modules/lucide-react/dist/esm/icons/send.js
-var __iconNode6 = [
+var __iconNode7 = [
   [
     "path",
     {
@@ -162,23 +176,23 @@ var __iconNode6 = [
   ],
   ["path", { d: "m21.854 2.147-10.94 10.939", key: "12cjpa" }]
 ];
-var Send = createLucideIcon("send", __iconNode6);
+var Send = createLucideIcon("send", __iconNode7);
 
 // ../../node_modules/lucide-react/dist/esm/icons/smile.js
-var __iconNode7 = [
+var __iconNode8 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "M8 14s1.5 2 4 2 4-2 4-2", key: "1y1vjs" }],
   ["line", { x1: "9", x2: "9.01", y1: "9", y2: "9", key: "yxxnd0" }],
   ["line", { x1: "15", x2: "15.01", y1: "9", y2: "9", key: "1p4y9e" }]
 ];
-var Smile = createLucideIcon("smile", __iconNode7);
+var Smile = createLucideIcon("smile", __iconNode8);
 
 // ../../node_modules/lucide-react/dist/esm/icons/x.js
-var __iconNode8 = [
+var __iconNode9 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X = createLucideIcon("x", __iconNode8);
+var X = createLucideIcon("x", __iconNode9);
 
 // ../../node_modules/date-fns/toDate.mjs
 function toDate(argument) {
@@ -1594,6 +1608,12 @@ var MessageClient = class {
     });
   }
 };
+
+// src/internal/widgetSignals.ts
+function isNewOpenSignal(prevNonce, signal) {
+  if (!signal) return false;
+  return signal.nonce !== prevNonce;
+}
 var ONLINE_MS = 45 * 1e3;
 function isOnline(lastSeenAt) {
   if (!lastSeenAt) return false;
@@ -1608,7 +1628,9 @@ function GlobalChatWidget({
   onOpenFullPage,
   onOpenInbox,
   onUnreadChange,
-  onUploadAttachment
+  onUploadAttachment,
+  openSignal,
+  onComposeNew
 }) {
   const clientRef = useRef(null);
   if (!clientRef.current || clientRef.current.__apiBaseUrl !== apiBaseUrl) {
@@ -1641,6 +1663,7 @@ function GlobalChatWidget({
   const dismissedRef = useRef(false);
   const prevUnreadRef = useRef(-1);
   const prevHiddenRef = useRef(true);
+  const prevOpenNonceRef = useRef(null);
   const hidden = pathname.startsWith("/messages");
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -1702,6 +1725,16 @@ function GlobalChatWidget({
   useEffect(() => {
     if (open && !activeConvId) fetchConvs();
   }, [open, activeConvId, fetchConvs]);
+  useEffect(() => {
+    if (!isNewOpenSignal(prevOpenNonceRef.current, openSignal)) return;
+    prevOpenNonceRef.current = openSignal.nonce;
+    setOpen(true);
+    const cid = openSignal.conversationId;
+    if (cid != null) {
+      fetchConvs();
+      openConv(cid);
+    }
+  }, [openSignal]);
   useEffect(() => {
     if (isAtBottomRef.current) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -1873,11 +1906,26 @@ function GlobalChatWidget({
           dismissedRef.current = true;
         }, className: "hover:text-blue-200 shrink-0 ml-1", children: /* @__PURE__ */ jsx(X, { size: 15 }) })
       ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-        /* @__PURE__ */ jsx("span", { className: "text-sm font-medium", children: "\u79C1\u4EBA\u8A0A\u606F" }),
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 min-w-0", children: [
+          /* @__PURE__ */ jsx("span", { className: "text-sm font-medium", children: "\u79C1\u4EBA\u8A0A\u606F" }),
+          onComposeNew && /* @__PURE__ */ jsxs(
+            "button",
+            {
+              onClick: onComposeNew,
+              className: "flex items-center gap-1 text-xs bg-blue-600 hover:bg-blue-500 rounded px-1.5 py-0.5 transition-colors",
+              title: "\u65B0\u5C0D\u8A71",
+              "aria-label": "\u65B0\u5C0D\u8A71",
+              children: [
+                /* @__PURE__ */ jsx(MessageSquarePlus, { size: 13 }),
+                "\u65B0\u5C0D\u8A71"
+              ]
+            }
+          )
+        ] }),
         /* @__PURE__ */ jsx("button", { onClick: () => {
           setOpen(false);
           dismissedRef.current = true;
-        }, className: "hover:text-blue-200", children: /* @__PURE__ */ jsx(X, { size: 15 }) })
+        }, className: "hover:text-blue-200 shrink-0", children: /* @__PURE__ */ jsx(X, { size: 15 }) })
       ] }) }),
       !activeConvId && /* @__PURE__ */ jsxs("div", { className: "flex-1 overflow-y-auto divide-y divide-gray-100", children: [
         convs.length === 0 && /* @__PURE__ */ jsx("p", { className: "text-center text-sm text-gray-400 py-10", children: "\u5C1A\u7121\u5C0D\u8A71" }),
@@ -1980,16 +2028,18 @@ function GlobalChatWidget({
         ] }),
         stickerOpen && /* @__PURE__ */ jsx("div", { className: "px-2 py-2 border-t bg-white grid grid-cols-8 gap-1 shrink-0", children: STICKERS.map((s) => /* @__PURE__ */ jsx("button", { onClick: () => sendSticker(s.emoji), className: "hover:bg-gray-100 rounded-lg p-0.5 transition-colors flex items-center justify-center", children: /* @__PURE__ */ jsx("img", { src: stickerUrl(s.id), alt: s.emoji, className: "w-7 h-7" }) }, s.id)) }),
         /* @__PURE__ */ jsxs("div", { className: "px-2 py-2 border-t flex gap-1.5 shrink-0 bg-white", children: [
-          /* @__PURE__ */ jsx("input", { ref: fileInputRef, type: "file", className: "hidden", onChange: (e) => {
-            const file = e.target.files?.[0] ?? null;
-            if (file && file.size > 3 * 1024 * 1024) {
-              setUploadError("\u6A94\u6848\u5927\u5C0F\u4E0D\u53EF\u8D85\u904E 3 MB");
-              e.target.value = "";
-              return;
-            }
-            setPendingFile(file);
-          } }),
-          /* @__PURE__ */ jsx("button", { onClick: () => fileInputRef.current?.click(), className: "shrink-0 p-1.5 text-gray-400 hover:text-blue-600 rounded-lg transition-colors", title: "\u9644\u52A0\u6A94\u6848", children: /* @__PURE__ */ jsx(Paperclip, { size: 15 }) }),
+          onUploadAttachment && /* @__PURE__ */ jsxs(Fragment, { children: [
+            /* @__PURE__ */ jsx("input", { ref: fileInputRef, type: "file", className: "hidden", onChange: (e) => {
+              const file = e.target.files?.[0] ?? null;
+              if (file && file.size > 3 * 1024 * 1024) {
+                setUploadError("\u6A94\u6848\u5927\u5C0F\u4E0D\u53EF\u8D85\u904E 3 MB");
+                e.target.value = "";
+                return;
+              }
+              setPendingFile(file);
+            } }),
+            /* @__PURE__ */ jsx("button", { onClick: () => fileInputRef.current?.click(), className: "shrink-0 p-1.5 text-gray-400 hover:text-blue-600 rounded-lg transition-colors", title: "\u9644\u52A0\u6A94\u6848", children: /* @__PURE__ */ jsx(Paperclip, { size: 15 }) })
+          ] }),
           /* @__PURE__ */ jsx("button", { onClick: () => setStickerOpen((o) => !o), className: `shrink-0 p-1.5 rounded-lg transition-colors ${stickerOpen ? "text-blue-600 bg-blue-50" : "text-gray-400 hover:text-blue-600"}`, title: "\u8CBC\u5716", children: /* @__PURE__ */ jsx(Smile, { size: 15 }) }),
           /* @__PURE__ */ jsx(
             "input",
@@ -2053,6 +2103,7 @@ lucide-react/dist/esm/createLucideIcon.js:
 lucide-react/dist/esm/icons/arrow-left.js:
 lucide-react/dist/esm/icons/file-text.js:
 lucide-react/dist/esm/icons/message-circle.js:
+lucide-react/dist/esm/icons/message-square-plus.js:
 lucide-react/dist/esm/icons/paperclip.js:
 lucide-react/dist/esm/icons/reply.js:
 lucide-react/dist/esm/icons/send.js:

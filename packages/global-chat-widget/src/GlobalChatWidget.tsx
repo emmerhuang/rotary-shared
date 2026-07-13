@@ -20,12 +20,13 @@
  */
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { MessageCircle, X, Send, ArrowLeft, Paperclip, FileText, Reply, Smile } from 'lucide-react'
+import { MessageCircle, X, Send, ArrowLeft, Paperclip, FileText, Reply, Smile, MessageSquarePlus } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { STICKERS, stickerUrl, getStickerMatch } from './internal/stickers'
 import { MessageClient, MessageHubError } from './internal/messageClient'
 import type { ConversationSummary, HubMessage } from './internal/messageClient'
+import { isNewOpenSignal, type OpenSignal } from './internal/widgetSignals'
 
 const ONLINE_MS = 45 * 1000
 
@@ -61,6 +62,18 @@ export interface GlobalChatWidgetProps {
    * 回傳 { url, name, type }；失敗 throw Error。
    */
   onUploadAttachment?: (file: File) => Promise<{ url: string; name: string; type: string }>
+  /**
+   * 外部指令開啟 widget（D1 私訊，additive optional）。host 帶單調遞增 nonce 表示
+   * 「請打開」，可選 conversationId 直接開到某對話。**不傳＝行為 bit-for-bit 不變**
+   * （AT-MSG-7；rotaryCredit 不傳＝零影響）。widget 的 open 原本純內部 state、外部
+   * 開不了 —— 這 prop 補上「Navbar 訊息圖示點擊 / 建對話成功後跳入」兩個 host 需求。
+   */
+  openSignal?: OpenSignal | null
+  /**
+   * 顯示「新對話」入口（D1 私訊，additive optional）。有傳才在清單 header 渲染「新對話」
+   * 鈕，點擊交還 host 開發起對話 dialog。**不傳＝鈕不出現、與現狀相同**（AT-MSG-7）。
+   */
+  onComposeNew?: () => void
   /** 預留主題客製化（v1 未實作；佔欄位避 break change） */
   theme?: { primary?: string }
 }
@@ -77,6 +90,8 @@ export function GlobalChatWidget({
   onOpenInbox,
   onUnreadChange,
   onUploadAttachment,
+  openSignal,
+  onComposeNew,
 }: GlobalChatWidgetProps) {
   // ── SDK instance（apiBaseUrl/token callback 變動時 re-create）──────
   const clientRef = useRef<MessageClient | null>(null)
@@ -113,6 +128,7 @@ export function GlobalChatWidget({
   const dismissedRef = useRef(false)
   const prevUnreadRef = useRef(-1)
   const prevHiddenRef = useRef(true)
+  const prevOpenNonceRef = useRef<number | null>(null)
   const hidden = pathname.startsWith('/messages')
 
   useEffect(() => setMounted(true), [])
@@ -188,6 +204,20 @@ export function GlobalChatWidget({
   useEffect(() => {
     if (open && !activeConvId) fetchConvs()
   }, [open, activeConvId, fetchConvs])
+
+  // 外部指令開啟（D1，openSignal）：nonce 變新才觸發一次，同 nonce re-render 不重複彈開。
+  // openSignal 不傳（rotaryCredit 現行用法）→ isNewOpenSignal 恆 false → 此 effect 為 no-op。
+  useEffect(() => {
+    if (!isNewOpenSignal(prevOpenNonceRef.current, openSignal)) return
+    prevOpenNonceRef.current = openSignal!.nonce
+    setOpen(true)
+    const cid = openSignal!.conversationId
+    if (cid != null) {
+      fetchConvs()   // 補清單讓 header 顯示對方社名
+      openConv(cid)  // 直接開到該對話
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openSignal])
 
   // Scroll to bottom only when already at bottom
   useEffect(() => {
@@ -380,8 +410,21 @@ export function GlobalChatWidget({
               </>
             ) : (
               <>
-                <span className="text-sm font-medium">私人訊息</span>
-                <button onClick={() => { setOpen(false); dismissedRef.current = true }} className="hover:text-blue-200"><X size={15} /></button>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-sm font-medium">私人訊息</span>
+                  {onComposeNew && (
+                    <button
+                      onClick={onComposeNew}
+                      className="flex items-center gap-1 text-xs bg-blue-600 hover:bg-blue-500 rounded px-1.5 py-0.5 transition-colors"
+                      title="新對話"
+                      aria-label="新對話"
+                    >
+                      <MessageSquarePlus size={13} />
+                      新對話
+                    </button>
+                  )}
+                </div>
+                <button onClick={() => { setOpen(false); dismissedRef.current = true }} className="hover:text-blue-200 shrink-0"><X size={15} /></button>
               </>
             )}
           </div>
@@ -530,18 +573,24 @@ export function GlobalChatWidget({
                 </div>
               )}
               <div className="px-2 py-2 border-t flex gap-1.5 shrink-0 bg-white">
-                <input ref={fileInputRef} type="file" className="hidden" onChange={e => {
-                  const file = e.target.files?.[0] ?? null
-                  if (file && file.size > 3 * 1024 * 1024) {
-                    setUploadError('檔案大小不可超過 3 MB')
-                    e.target.value = ''
-                    return
-                  }
-                  setPendingFile(file)
-                }} />
-                <button onClick={() => fileInputRef.current?.click()} className="shrink-0 p-1.5 text-gray-400 hover:text-blue-600 rounded-lg transition-colors" title="附加檔案">
-                  <Paperclip size={15} />
-                </button>
+                {/* 附件上傳 UI 只在 host 有注入 onUploadAttachment 時出現（F17 契約：host 自決）。
+                    不注入＝迴紋針與 file input 都不渲染（rotarysso D5 無附件；credit 有注入不受影響）。 */}
+                {onUploadAttachment && (
+                  <>
+                    <input ref={fileInputRef} type="file" className="hidden" onChange={e => {
+                      const file = e.target.files?.[0] ?? null
+                      if (file && file.size > 3 * 1024 * 1024) {
+                        setUploadError('檔案大小不可超過 3 MB')
+                        e.target.value = ''
+                        return
+                      }
+                      setPendingFile(file)
+                    }} />
+                    <button onClick={() => fileInputRef.current?.click()} className="shrink-0 p-1.5 text-gray-400 hover:text-blue-600 rounded-lg transition-colors" title="附加檔案">
+                      <Paperclip size={15} />
+                    </button>
+                  </>
+                )}
                 <button onClick={() => setStickerOpen(o => !o)} className={`shrink-0 p-1.5 rounded-lg transition-colors ${stickerOpen ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-blue-600'}`} title="貼圖">
                   <Smile size={15} />
                 </button>
