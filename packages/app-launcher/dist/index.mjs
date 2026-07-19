@@ -256,7 +256,7 @@ function AppIcon({ app }) {
         alt: "",
         width: 40,
         height: 40,
-        style: { width: 40, height: 40, borderRadius: 10, objectFit: "cover" },
+        style: { width: 40, height: 40, borderRadius: 10, objectFit: "contain" },
         onError: () => setBroken(true)
       }
     );

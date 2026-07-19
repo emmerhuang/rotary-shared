@@ -271,7 +271,8 @@ function AppIcon({ app }: { app: LauncherApp }) {
         alt=""
         width={40}
         height={40}
-        style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover' }}
+        // object-contain：非正方形圖示等比縮入 40×40 正方框、留白置中，不裁切
+        style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'contain' }}
         onError={() => setBroken(true)}
       />
     )

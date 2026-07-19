@@ -74,6 +74,14 @@ describe('AppLauncher — icon fallback', () => {
     expect(img).toHaveAttribute('src', 'https://cdn.example.com/credit.png')
   })
 
+  it('非正方形圖示縮入正方形（object-contain）不截切', () => {
+    render(<AppLauncher apps={[APPS[1]]} />)
+    openPanel()
+    const img = document.querySelector('img')!
+    // 完整縮入正方形容器、留白置中，而非 cover 硬裁
+    expect(img.style.objectFit).toBe('contain')
+  })
+
   it('javascript: iconUrl → 不進 DOM，改 fallback（首字 B）', () => {
     render(<AppLauncher apps={[APPS[2]]} />)
     openPanel()
