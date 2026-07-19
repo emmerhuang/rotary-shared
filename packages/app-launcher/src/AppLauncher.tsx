@@ -261,27 +261,41 @@ function AppTile({
   )
 }
 
+// 所有圖示（含 fallback）共用的固定正方形 tile 尺寸，確保有 logo / 無 logo 視覺對齊。
+const ICON_TILE = 40
+
 function AppIcon({ app }: { app: LauncherApp }) {
   const [broken, setBroken] = useState(false)
   const showImg = isSafeIconUrl(app.iconUrl) && !broken
   if (showImg) {
+    // 固定正方形容器（淺底 + 1px 邊框）給 logo 明確視覺邊界；
+    // 寬扁 / 直長 logo 以 contain 等比縮入置中留白，與 fallback 色塊 tile 同尺寸對齊。
     return (
-      <img
-        src={app.iconUrl as string}
-        alt=""
-        width={40}
-        height={40}
-        // object-contain：非正方形圖示等比縮入 40×40 正方框、留白置中，不裁切
-        style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'contain' }}
-        onError={() => setBroken(true)}
-      />
+      <span
+        data-testid="app-icon-tile"
+        style={{
+          width: ICON_TILE, height: ICON_TILE, borderRadius: 10, boxSizing: 'border-box',
+          background: '#f1f5f9', border: '1px solid #e5e7eb', padding: 4,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+        }}
+      >
+        <img
+          src={app.iconUrl as string}
+          alt=""
+          // contain：非正方形 logo 等比縮入容器、留白置中，不裁切
+          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+          onError={() => setBroken(true)}
+        />
+      </span>
     )
   }
   return (
     <span
       aria-hidden="true"
+      data-testid="app-icon-tile"
       style={{
-        width: 40, height: 40, borderRadius: 10, background: fallbackColor(app.key),
+        width: ICON_TILE, height: ICON_TILE, borderRadius: 10, boxSizing: 'border-box',
+        background: fallbackColor(app.key),
         color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 18, fontWeight: 700,
       }}

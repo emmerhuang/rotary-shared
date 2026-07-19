@@ -82,6 +82,32 @@ describe('AppLauncher — icon fallback', () => {
     expect(img.style.objectFit).toBe('contain')
   })
 
+  it('logo 有固定正方形容器（40×40），img 以 contain 縮入其中', () => {
+    render(<AppLauncher apps={[APPS[1]]} />)
+    openPanel()
+    const tile = screen.getByTestId('app-icon-tile')
+    // 固定正方形 tile 給 logo 明確視覺邊界
+    expect(tile.style.width).toBe('40px')
+    expect(tile.style.height).toBe('40px')
+    // img 是容器的子節點、以 contain 等比縮入
+    const img = document.querySelector('img')!
+    expect(tile.contains(img)).toBe(true)
+    expect(img.style.objectFit).toBe('contain')
+  })
+
+  it('有 logo 與無 logo（fallback）呈現一致尺寸的方形 tile', () => {
+    const { rerender } = render(<AppLauncher apps={[APPS[1]]} />)
+    openPanel()
+    const withLogo = screen.getByTestId('app-icon-tile')
+    const logoW = withLogo.style.width
+    const logoH = withLogo.style.height
+    // 換成無 logo 的 app（fallback 色塊）
+    rerender(<AppLauncher apps={[APPS[0]]} />)
+    const fallbackTile = screen.getByTestId('app-icon-tile')
+    expect(fallbackTile.style.width).toBe(logoW)
+    expect(fallbackTile.style.height).toBe(logoH)
+  })
+
   it('javascript: iconUrl → 不進 DOM，改 fallback（首字 B）', () => {
     render(<AppLauncher apps={[APPS[2]]} />)
     openPanel()

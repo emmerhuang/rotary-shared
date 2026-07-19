@@ -245,19 +245,37 @@ function AppTile({
     }
   );
 }
+var ICON_TILE = 40;
 function AppIcon({ app }) {
   const [broken, setBroken] = useState(false);
   const showImg = isSafeIconUrl(app.iconUrl) && !broken;
   if (showImg) {
     return /* @__PURE__ */ jsx(
-      "img",
+      "span",
       {
-        src: app.iconUrl,
-        alt: "",
-        width: 40,
-        height: 40,
-        style: { width: 40, height: 40, borderRadius: 10, objectFit: "contain" },
-        onError: () => setBroken(true)
+        "data-testid": "app-icon-tile",
+        style: {
+          width: ICON_TILE,
+          height: ICON_TILE,
+          borderRadius: 10,
+          boxSizing: "border-box",
+          background: "#f1f5f9",
+          border: "1px solid #e5e7eb",
+          padding: 4,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden"
+        },
+        children: /* @__PURE__ */ jsx(
+          "img",
+          {
+            src: app.iconUrl,
+            alt: "",
+            style: { maxWidth: "100%", maxHeight: "100%", objectFit: "contain" },
+            onError: () => setBroken(true)
+          }
+        )
       }
     );
   }
@@ -265,10 +283,12 @@ function AppIcon({ app }) {
     "span",
     {
       "aria-hidden": "true",
+      "data-testid": "app-icon-tile",
       style: {
-        width: 40,
-        height: 40,
+        width: ICON_TILE,
+        height: ICON_TILE,
         borderRadius: 10,
+        boxSizing: "border-box",
         background: fallbackColor(app.key),
         color: "#fff",
         display: "flex",
